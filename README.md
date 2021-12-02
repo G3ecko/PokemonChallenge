@@ -6,7 +6,7 @@
   
 ## How to run app
 * git clone https://github.com/G3ecko/PokemonChallenge
-* cd src/Challange
+* cd src/Challenge
 * dotnet run
 
 
