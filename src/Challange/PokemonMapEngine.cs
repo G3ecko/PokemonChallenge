@@ -10,7 +10,7 @@ public class PokemonMapEngine
     /// <summary>
     /// Map cardinal direction with value.
     /// </summary>
-    private readonly Dictionary<CardinalPosition, int> _positionValueMap;
+    private readonly Dictionary<CardinalPosition, CardinalAxis> _positionValueMap;
 
     /// <summary>
     /// Positions that Ash already caputre pokemons.
@@ -18,17 +18,31 @@ public class PokemonMapEngine
     private readonly HashSet<MapPoint> _capturedPositions;
 
     /// <summary>
+    /// Struct that relation cardinal unit value and axis.
+    /// </summary>
+    /// <param name="cardinalValue"></param>
+    /// <param name="axis"></param>
+    private record struct CardinalAxis(int cardinalValue, Axis axis);
+
+    /// <summary>
+    /// Struct represent a map point.
+    /// </summary>
+    /// <param name="x"> X Axis</param>
+    /// <param name="y">Y Axis</param>
+    private record struct MapPoint(int x, int y);
+
+    /// <summary>
     /// PokemonMapEngine constructor.
     /// </summary>
     public PokemonMapEngine()
     {
         _capturedPositions = new HashSet<MapPoint>();
-        _positionValueMap = new Dictionary<CardinalPosition, int>()
+        _positionValueMap = new Dictionary<CardinalPosition, CardinalAxis>()
         {
-            { CardinalPosition.N,  1 }, //North value
-            { CardinalPosition.S, -1 }, //South value
-            { CardinalPosition.E,  1 }, //East value
-            { CardinalPosition.O, -1 }, //West value
+            { CardinalPosition.N, new CardinalAxis(1, Axis.Y) }, //North unit value and axis.
+            { CardinalPosition.S, new CardinalAxis(-1,Axis.Y) }, //South unit value and axis.
+            { CardinalPosition.E, new CardinalAxis(1, Axis.X) }, //East unit value and axis.
+            { CardinalPosition.O, new CardinalAxis(-1,Axis.X) }, //West unit value and axis.
          };
     }
 
@@ -59,10 +73,15 @@ public class PokemonMapEngine
                 throw new InvalidOperationException($"{direction} is not valid");
             }
 
-            var directionAxis = GetDirectionAxis(cardinalPosition);
+            if (!_positionValueMap.ContainsKey(cardinalPosition))
+            {
+                throw new OutOfMemoryException($"{cardinalPosition} is not configured");
+            }
 
-            currentPositionPoint = new MapPoint(directionAxis == Axis.X ? currentPositionPoint.X + (_positionValueMap[cardinalPosition]) : currentPositionPoint.X,
-                                        directionAxis == Axis.Y ? currentPositionPoint.Y + (_positionValueMap[cardinalPosition]) : currentPositionPoint.Y);
+            var directionAxis = _positionValueMap[cardinalPosition];
+
+            currentPositionPoint = new MapPoint(directionAxis.axis == Axis.X ? currentPositionPoint.x + (directionAxis.cardinalValue) : currentPositionPoint.x,
+                                        directionAxis.axis == Axis.Y ? currentPositionPoint.y + (directionAxis.cardinalValue) : currentPositionPoint.y);
 
 
             if (!_capturedPositions.Contains(currentPositionPoint))
@@ -80,20 +99,5 @@ public class PokemonMapEngine
     /// Reset all current positions.
     /// </summary>
     public void ResetPositions() => _capturedPositions.Clear();
-
-    /// <summary>
-    /// Get direction axis.
-    /// </summary>
-    /// <param name="direction">direction</param>
-    /// <returns>Axis</returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    private Axis GetDirectionAxis(CardinalPosition direction) => direction switch
-    {
-        CardinalPosition.N => Axis.Y,
-        CardinalPosition.S => Axis.Y,
-        CardinalPosition.O => Axis.X,
-        CardinalPosition.E => Axis.X,
-        _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Not expected direction value: {direction}"),
-    };
 
 }
