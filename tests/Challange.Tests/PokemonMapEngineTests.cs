@@ -15,7 +15,7 @@ namespace Challange.Tests
         {
             PokemonMapEngine pokemonMapEngine = new PokemonMapEngine();
 
-            Should.Throw<InvalidOperationException>(() => pokemonMapEngine.DoMovement(userInput));
+            Should.Throw<IndexOutOfRangeException>(() => pokemonMapEngine.DoMovement(userInput));
         }
 
         [Theory]

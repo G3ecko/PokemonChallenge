@@ -10,7 +10,7 @@ public class PokemonMapEngine
     /// <summary>
     /// Map cardinal direction with value.
     /// </summary>
-    private readonly Dictionary<CardinalPosition, CardinalAxis> _positionValueMap;
+    private readonly Dictionary<char, CardinalAxis> _positionValueMap;
 
     /// <summary>
     /// Positions that Ash already caputre pokemons.
@@ -37,12 +37,12 @@ public class PokemonMapEngine
     public PokemonMapEngine()
     {
         _capturedPositions = new HashSet<MapPoint>();
-        _positionValueMap = new Dictionary<CardinalPosition, CardinalAxis>()
+        _positionValueMap = new Dictionary<char, CardinalAxis>()
         {
-            { CardinalPosition.N, new CardinalAxis(1, Axis.Y) }, //North unit value and axis.
-            { CardinalPosition.S, new CardinalAxis(-1,Axis.Y) }, //South unit value and axis.
-            { CardinalPosition.E, new CardinalAxis(1, Axis.X) }, //East unit value and axis.
-            { CardinalPosition.O, new CardinalAxis(-1,Axis.X) }, //West unit value and axis.
+            { 'N', new CardinalAxis(1, Axis.Y) }, //North unit value and axis.
+            { 'S', new CardinalAxis(-1,Axis.Y) }, //South unit value and axis.
+            { 'E', new CardinalAxis(1, Axis.X) }, //East unit value and axis.
+            { 'O', new CardinalAxis(-1,Axis.X) }, //West unit value and axis.
          };
     }
 
@@ -67,22 +67,15 @@ public class PokemonMapEngine
 
         foreach (var direction in directions)
         {
-            bool directionExists = Enum.TryParse(direction.ToString(), out CardinalPosition cardinalPosition);
-            if (!directionExists)
+            if (!_positionValueMap.ContainsKey(direction))
             {
-                throw new InvalidOperationException($"{direction} is not valid");
+                throw new IndexOutOfRangeException($"{direction} is not configured");
             }
 
-            if (!_positionValueMap.ContainsKey(cardinalPosition))
-            {
-                throw new OutOfMemoryException($"{cardinalPosition} is not configured");
-            }
-
-            var directionAxis = _positionValueMap[cardinalPosition];
+            var directionAxis = _positionValueMap[direction];
 
             currentPositionPoint = new MapPoint(directionAxis.axis == Axis.X ? currentPositionPoint.x + (directionAxis.cardinalValue) : currentPositionPoint.x,
                                         directionAxis.axis == Axis.Y ? currentPositionPoint.y + (directionAxis.cardinalValue) : currentPositionPoint.y);
-
 
             if (!_capturedPositions.Contains(currentPositionPoint))
                 _capturedPositions.Add(currentPositionPoint);
