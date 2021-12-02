@@ -6,14 +6,14 @@ while (true)
 {
     try
     {
-        Console.WriteLine("Enter pokmen map directions");
+      
         var userDirectionsInput = Console.ReadLine();
 
         if (userDirectionsInput != null)
         {
             mapEngine.DoMovement(userDirectionsInput);
             var capturesNumber = mapEngine.GetCapturedPokemons();
-            Console.WriteLine($"Number of catched pokemons is {capturesNumber}");
+            Console.WriteLine($"{capturesNumber}");
         }
     }
     catch (InvalidOperationException ex)
